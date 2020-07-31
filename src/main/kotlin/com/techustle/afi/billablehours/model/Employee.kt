@@ -6,14 +6,17 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 
 @Entity
-class Employee(
+open class Employee(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        var id: Long = 0,
+        var id: Long,
         var name: String,
         var role: String,
         var level:String,
         var rate:String
 ) {
-        constructor()
+//        constructor() : this()
 }
+
+
+//data class User(override val id:Long):Employee()

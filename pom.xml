@@ -74,8 +74,8 @@
     </dependencies>
 
     <build>
-        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+<!--        <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>-->
+<!--        <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>-->
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -108,5 +108,16 @@
             </plugin>
         </plugins>
     </build>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-snapshots</id>
+            <url>https://repo.spring.io/snapshot</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>spring-milestones</id>
+            <url>https://repo.spring.io/milestone</url>
+        </pluginRepository>
+    </pluginRepositories>
 
 </project>
