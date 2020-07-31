@@ -1,23 +1,23 @@
 package com.techustle.afi.billablehours.service
 
 import com.techustle.afi.billablehours.model.Employee
-import com.techustle.afi.billablehours.repository.EmployeeRepository
+import com.techustle.afi.billablehours.repository.EmployeeManagementRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class EmployeeService(val employeeRepository: EmployeeRepository) {
+class EmployeeManagementService(val employeeManagementRepository: EmployeeManagementRepository) {
     fun findEmployee(id: Long): Employee? {
-        return employeeRepository.findByIdOrNull(id)
+        return employeeManagementRepository.findByIdOrNull(id)
     }
 
     fun createEmployee(employee: Employee): Employee {
-        return employeeRepository.save(employee)
+        return employeeManagementRepository.save(employee)
     }
 
     fun getEmployees(): MutableList<Employee> {
-        return employeeRepository.findAll()
+        return employeeManagementRepository.findAll()
     }
 }
 

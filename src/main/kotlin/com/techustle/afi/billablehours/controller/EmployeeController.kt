@@ -1,42 +1,45 @@
 package com.techustle.afi.billablehours.controller
 
 import com.techustle.afi.billablehours.model.Employee
-import com.techustle.afi.billablehours.service.EmployeeService
-import lombok.extern.log4j.Log4j
-import org.springframework.stereotype.Controller
+import com.techustle.afi.billablehours.repository.JobManagementRepository
+import com.techustle.afi.billablehours.service.EmployeeManagementService
+import lombok.extern.slf4j.Slf4j
 import org.springframework.web.bind.annotation.*
-import java.util.*
 
-@Log4j
+@Slf4j
 @RestController
-@RequestMapping(name = "/api/v1")
-class EmployeeController (val employeeService: EmployeeService) {
+@RequestMapping("/api/v1")
+class EmployeeController (val employeeManagementService: EmployeeManagementService) {
 
 
-
-    @GetMapping(name = "/employee/{id}")
-    fun getEmployee(@PathVariable(name ="id") id:Long): Employee? {
-        logg
-        return employeeService.findEmployee(id)
-    }
-
-    @PostMapping(name = "/employee")
+    @PostMapping("/employee")
     fun addNewEmployee(@RequestBody employee:Employee): Employee{
-        val employees: MutableList<Employee> = employeeService.getEmployees()
-        return employeeService.createEmployee(employee)
+        return employeeManagementService.createEmployee(employee)
     }
 
-    @PutMapping(name = "/employee/{id}/{rate}")
-    fun changeEmployeeRate(@PathVariable(name="id")id: Long, @PathVariable(name="rate") rate: String): Employee{
-        val employees: MutableList<Employee> = employeeService.getEmployees()
-        val employee: Employee?  = employeeService.findEmployee(id)
-        if (employee != null){
+    @GetMapping("/employee/{id}")
+    fun getEmployee(@PathVariable(name ="id") id:Long): Employee? {
+        return employeeManagementService.findEmployee(id)
+    }
+
+    @GetMapping("/employees")
+    fun getAllEmployee(): MutableList<Employee> {
+        return employeeManagementService.getEmployees()
+    }
+
+
+    @PutMapping("/employee/{id}/{rate}")
+    fun changeEmployeeRate(@PathVariable(name="id")id: Long, @PathVariable(name="rate") rate: Double): Employee? {
+        val employee: Employee?  = employeeManagementService.findEmployee(id)
+        return if (employee != null){
             employee.rate = rate
-            employeeService.createEmployee(employee)
+            employeeManagementService.createEmployee(employee)
+            employee
         }else{
             println()
+            null
         }
-        return employee as Employee
+
     }
 
 }
