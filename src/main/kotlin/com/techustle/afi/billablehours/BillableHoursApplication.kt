@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
 
 @SpringBootApplication
-@EnableAutoConfiguration
+//@EnableAutoConfiguration
 @EnableJpaRepositories("com.techustle.afi.billablehours.repository")
-@ComponentScan(basePackages = "com.techustle.afi.billablehours")
+//@ComponentScan(basePackages = "com.techustle.afi.billablehours")
 class BillableHoursApplication
 
 fun main(args: Array<String>) {
