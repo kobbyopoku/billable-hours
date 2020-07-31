@@ -23,12 +23,18 @@ class JobController(val jobManagementService: JobManagementService, val employee
 
     @GetMapping("/job/employee/{id}")
     fun getEmployeeJobs(@PathVariable(name = "id") employeeId: Long):MutableList<EmployeeJobs>{
-        return jobManagementService.getEmployeeJobs(employeeId)
+        val employee = employeeManagementService.findEmployee(employeeId)
+        return jobManagementService.getEmployeeJobs(employee as Employee)
     }
 
     @GetMapping("/jobs")
     fun getAllJobs(): MutableIterable<EmployeeJobs> {
         return jobManagementService.getAllEmployeesJobs()
+    }
+
+    @GetMapping("/jobs/company/{company}")
+    fun getAllCompanyJobs(@PathVariable(name = "company") company: String): MutableIterable<EmployeeJobs> {
+        return jobManagementService.getAllCompanyJobs(company)
     }
 
 }
