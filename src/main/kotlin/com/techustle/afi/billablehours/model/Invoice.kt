@@ -1,5 +1,6 @@
 package com.techustle.afi.billablehours.model
 
+import com.techustle.afi.billablehours.data.InvoiceData
 import javax.persistence.*
 
 @Entity
@@ -10,7 +11,7 @@ class Invoice(
         var company: String,
 
         @OneToMany
-        var invoiceDataList: MutableList<Any>) {
+        var invoiceDataList: MutableList<InvoiceData>) {
 
 
 }
