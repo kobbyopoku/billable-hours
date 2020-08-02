@@ -23,7 +23,7 @@ class EmployeeController (val employeeManagementService: EmployeeManagementServi
     }
 
     @GetMapping("/employees")
-    fun getAllEmployee(): MutableList<Employee> {
+    fun getAllEmployee(): MutableIterable<Employee> {
         return employeeManagementService.getEmployees()
     }
 

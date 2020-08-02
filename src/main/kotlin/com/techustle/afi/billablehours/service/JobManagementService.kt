@@ -12,7 +12,7 @@ class JobManagementService(val jobManagementRepository: JobManagementRepository)
         return jobManagementRepository.save(employeeJobs)
     }
 
-    fun getEmployeeJobs(employee: Employee):MutableList<EmployeeJobs>{
+    fun getEmployeeJobs(employee: Employee):MutableIterator<EmployeeJobs>{
         return jobManagementRepository.findAllByEmployee(employee)
     }
 

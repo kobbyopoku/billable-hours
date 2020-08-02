@@ -16,7 +16,7 @@ class EmployeeManagementService(val employeeManagementRepository: EmployeeManage
         return employeeManagementRepository.save(employee)
     }
 
-    fun getEmployees(): MutableList<Employee> {
+    fun getEmployees(): MutableIterable<Employee> {
         return employeeManagementRepository.findAll()
     }
 }

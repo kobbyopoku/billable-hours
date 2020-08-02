@@ -16,13 +16,21 @@ class JobController(val jobManagementService: JobManagementService, val employee
     @PostMapping("/job/employee/{id}")
     fun recordJob(@RequestBody jobs: Jobs, @PathVariable(name ="id")employeeId: Long): EmployeeJobs{
         val employee: Employee? = employeeManagementService.findEmployee(employeeId)
-        val employeeJobs = EmployeeJobs(id=jobs.id, project = jobs.project, startTime = jobs.startTime, endTime = jobs.endTime, employee = employee, date = jobs.date)
+        val employeeJobs = EmployeeJobs(
+                id=jobs.id,
+                project = jobs.project,
+                startTime = jobs.startTime,
+                endTime = jobs.endTime,
+                employee = employee,
+                date = jobs.date,
+                status = true,
+                invoiceStatus = false)
         return  jobManagementService.addNewJob(employeeJobs)
     }
 
 
     @GetMapping("/job/employee/{id}")
-    fun getEmployeeJobs(@PathVariable(name = "id") employeeId: Long):MutableList<EmployeeJobs>{
+    fun getEmployeeJobs(@PathVariable(name = "id") employeeId: Long):MutableIterator<EmployeeJobs>{
         val employee = employeeManagementService.findEmployee(employeeId)
         return jobManagementService.getEmployeeJobs(employee as Employee)
     }

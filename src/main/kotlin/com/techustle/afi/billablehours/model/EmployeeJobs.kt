@@ -22,7 +22,11 @@ class EmployeeJobs(
 
         var startTime: LocalTime,
 
-        var endTime: LocalTime
+        var endTime: LocalTime,
+
+        var status : Boolean,
+
+        var invoiceStatus: Boolean
 ) {
 
 
