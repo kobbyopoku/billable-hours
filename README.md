@@ -34,3 +34,7 @@ sudo docker run -d --name=billable-rate-service  -i --net=host --memory=512m --e
 
 Link to swagger ui documentation after running service
 [Click here](http://localhost:8000/swagger-ui.html#/)
+
+```shell
+(http://localhost:8000/swagger-ui.html#/)
+```
