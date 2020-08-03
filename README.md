@@ -29,3 +29,10 @@ sudo env "PATH=$PATH" mvn -Dlane=release -Dspring.profiles.active=release instal
 ```shell
 sudo docker run -d --name=billable-rate-service  -i --net=host --memory=512m --expose=8000 -t [IMAGE_ID] /bin/bash
 ```
+
+## API Documentaion
+
+Link to swagger ui documentation after running service
+```
+http://localhost:8000/swagger-ui.html#/
+```
