@@ -7,16 +7,25 @@ import com.techustle.afi.billablehours.service.InvoiceManagementService
 import com.techustle.afi.billablehours.service.JobManagementService
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.SpringBootTest
 import java.time.LocalDate
+import java.time.LocalTime
 
+
+//@DataJpaTest
 @SpringBootTest
-class BillableHoursApplicationTests(val invoiceManagementService: InvoiceManagementService, val employeeManagementService: EmployeeManagementService, val jobManagementService: JobManagementService) {
+class BillableHoursApplicationTests() {
 
     @Test
-    fun contextLoads() {
+    fun timeDifferenceTest() {
+        Assertions.assertEquals(1,LocalTime.parse("21:00" ).hour - LocalTime.parse("20:00").hour)
     }
 
+}
+
+@DataJpaTest
+class JpaTest(val employeeManagementService: EmployeeManagementService, val jobManagementService: JobManagementService){
     @Test
     fun testSaveEmployee() {
         val employee: Employee =  Employee(1, "Godwin","Duah","gentlekobby@gmail.com","1234509876", "Software Engineer","4A",500.0)

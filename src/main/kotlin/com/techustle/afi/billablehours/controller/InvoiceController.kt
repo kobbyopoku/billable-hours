@@ -48,7 +48,7 @@ class InvoiceController (val jobManagementService: JobManagementService, val inv
                 run {
                     invoiceData?.id = job.id
                     invoiceData?.unitPrice = job.employee?.rate!!;
-                    invoiceData?.numberOfHours = LocalTime.parse( job.date.toString() + " " + job.endTime ).hour - LocalTime.parse(job.date.toString() + " " + job.startTime).hour
+                    invoiceData?.numberOfHours = LocalTime.parse(job.endTime ).hour - LocalTime.parse(job.startTime).hour
                     invoiceData?.cost = invoiceData?.unitPrice?.times(invoiceData.numberOfHours!!)!!
                     invoiceData.employee = job.employee!!
 
