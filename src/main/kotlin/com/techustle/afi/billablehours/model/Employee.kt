@@ -10,7 +10,10 @@ class Employee(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Long,
-        var name: String,
+        var firstName: String,
+        var lastName: String,
+        var email: String,
+        var password: String,
         var role: String,
         var grade:String,
         var rate:Double

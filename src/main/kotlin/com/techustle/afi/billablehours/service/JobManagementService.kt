@@ -20,8 +20,16 @@ class JobManagementService(val jobManagementRepository: JobManagementRepository)
         return jobManagementRepository.findAll()
     }
 
-    fun getAllCompanyJobs(company: String): MutableIterable<EmployeeJobs> {
+    fun getAllCompanyJobs(company: String): MutableList<EmployeeJobs> {
         return jobManagementRepository.findAllByProject(company)
+    }
+
+    fun deleteJobById(id: Long) {
+        jobManagementRepository.deleteById(id)
+    }
+
+    fun deleteJob(job: EmployeeJobs) {
+        jobManagementRepository.delete(job)
     }
 
 }

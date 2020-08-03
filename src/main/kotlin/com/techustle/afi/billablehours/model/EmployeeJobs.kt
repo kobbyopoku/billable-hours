@@ -1,9 +1,7 @@
 package com.techustle.afi.billablehours.model
 
 import org.springframework.data.annotation.CreatedDate
-import java.sql.Timestamp
 import java.time.LocalDate
-import java.time.LocalTime
 import javax.persistence.*
 
 @Entity
@@ -20,9 +18,10 @@ class EmployeeJobs(
         @CreatedDate
         var date: LocalDate,
 
-        var startTime: LocalTime,
 
-        var endTime: LocalTime,
+        var startTime: String,
+
+        var endTime: String,
 
         var status : Boolean,
 

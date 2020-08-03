@@ -18,7 +18,7 @@ interface EmployeeManagementRepository: CrudRepository<Employee, Long> {
 interface JobManagementRepository: CrudRepository<EmployeeJobs, Long>{
     fun findAllById(employeeId: Long):MutableIterator<EmployeeJobs>
     fun findAllByEmployee(employeeId: Employee): MutableIterator<EmployeeJobs>
-    fun findAllByProject(company: String): MutableIterable<EmployeeJobs>
+    fun findAllByProject(company: String): MutableList<EmployeeJobs>
     override fun findAll(): MutableIterable<EmployeeJobs>
 
 }

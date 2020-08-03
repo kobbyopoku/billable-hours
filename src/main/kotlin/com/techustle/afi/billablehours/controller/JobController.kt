@@ -53,4 +53,10 @@ class JobController(val jobManagementService: JobManagementService, val employee
         return jobManagementService.getAllCompanyJobs(company)
     }
 
+    @ApiOperation(httpMethod = "DELETE", value = "This endpoint is used to delete job by id")
+    @GetMapping("/jobs/company/{id}")
+    fun getAllCompanyJobs(@PathVariable(name = "id") id: Long) {
+        jobManagementService.deleteJobById(id)
+    }
+
 }

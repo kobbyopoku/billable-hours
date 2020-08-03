@@ -6,11 +6,11 @@ import javax.persistence.*
 @Entity
 class Invoice(
         @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
+        @GeneratedValue(strategy = GenerationType.AUTO)
         var id: Long?,
         var company: String,
 
-        @OneToMany
+        @OneToMany(fetch = FetchType.LAZY)
         var invoiceDataList: MutableList<InvoiceData>) {
 
 

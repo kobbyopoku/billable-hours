@@ -7,7 +7,6 @@ import javax.persistence.*
 @Entity
 data class InvoiceData(
         @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Long?,
 
         @OneToOne
@@ -16,6 +15,6 @@ data class InvoiceData(
         var unitPrice: Double?,
         var cost: Double?,
 
-        @ManyToOne
+        @OneToOne
         var invoice: Invoice?) {
 }

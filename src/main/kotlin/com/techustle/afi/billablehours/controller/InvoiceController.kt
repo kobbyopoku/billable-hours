@@ -8,13 +8,11 @@ import com.techustle.afi.billablehours.service.InvoiceManagementService
 import com.techustle.afi.billablehours.service.JobManagementService
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import java.time.LocalTime
 import java.util.*
 
-
+@CrossOrigin(origins = ["*"])
 @Api("This controller handles management and operations of invoices")
 @RestController
 @RequestMapping("api/v1")
@@ -26,38 +24,51 @@ class InvoiceController (val jobManagementService: JobManagementService, val inv
     fun generateInvoice( @PathVariable(name = "company") company:String):InvoiceResponseObject? {
         val requestId: String  = UUID.randomUUID().toString()
 
-        var invoice: Invoice = Invoice(Long.MIN_VALUE, "", mutableListOf());
+        var message: String
+        var status: Int
+        var invoice: Invoice = Invoice(null, "", mutableListOf());
         val companyJobs = jobManagementService.getAllCompanyJobs(company)
 
-        invoice.company = company;
+        if(companyJobs.isNotEmpty()) {
+            invoice.company = company;
+            invoice = invoiceManagementService.saveInvoice(invoice)
 
-        var invoiceData: InvoiceData? = InvoiceData(
-                Long.MIN_VALUE,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
 
-        companyJobs.forEach { job: EmployeeJobs ->
-            run {
-                invoiceData?.unitPrice = job.employee?.rate!!;
-                invoiceData?.numberOfHours = job.endTime.hour - job.startTime.hour
-                invoiceData?.cost = invoiceData?.unitPrice?.times(invoiceData.numberOfHours!!)!!
-                invoiceData.employee = job.employee!!
-//                invoiceData.invoice = invoice
+            var invoiceData: InvoiceData? = InvoiceData(
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+            );
 
-                invoiceManagementService.saveInvoiceData(invoiceData)
-                invoice.invoiceDataList.add(invoiceData)
+
+            companyJobs.forEach { job: EmployeeJobs ->
+                run {
+                    invoiceData?.id = job.id
+                    invoiceData?.unitPrice = job.employee?.rate!!;
+                    invoiceData?.numberOfHours = LocalTime.parse( job.date.toString() + " " + job.endTime ).hour - LocalTime.parse(job.date.toString() + " " + job.startTime).hour
+                    invoiceData?.cost = invoiceData?.unitPrice?.times(invoiceData.numberOfHours!!)!!
+                    invoiceData.employee = job.employee!!
+
+                    invoiceManagementService.saveInvoiceData(invoiceData)
+                    invoice.invoiceDataList.add(invoiceData)
+//                    jobManagementService.deleteJobById(job.id)
+                }
             }
+
+            invoiceManagementService.saveInvoice(invoice)
+
+            message="SUCCESS"
+            status = 200
+
+        }else {
+            message="DATA_NOT_FOUND"
+            status = 404
         }
+        val responseObject: InvoiceResponseObject = InvoiceResponseObject(requestId, message, status, invoice)
 
-        invoiceManagementService.saveInvoice(invoice)
-
-
-        val responseObject: InvoiceResponseObject = InvoiceResponseObject(requestId, "success", 200, invoice)
-        println(responseObject.requestId)
         return responseObject
     }
 }

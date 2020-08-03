@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service
 class InvoiceManagementService(val invoiceManagementRepository: InvoiceManagementRepository, val invoiceDataManagementRepository: InvoiceDataManagementRepository) {
 
 
-    fun saveInvoice(invoice: Invoice) {
-        invoiceManagementRepository.save(invoice)
+    fun saveInvoice(invoice: Invoice): Invoice {
+        return invoiceManagementRepository.save(invoice)
     }
 
     fun saveInvoiceData(invoiceData: InvoiceData){
