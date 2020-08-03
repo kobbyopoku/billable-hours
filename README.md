@@ -6,3 +6,6 @@ You work for one of the top law firms in Ghana. To be as efficient as possible, 
 
  
 The finance team has requested your help to be effective with revenue collection. 
+
+# Setup
+1. Clone this repo git clone 
