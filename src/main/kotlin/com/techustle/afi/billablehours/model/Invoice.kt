@@ -13,6 +13,7 @@ class Invoice(
         var company: String,
         var invoiceDate: LocalDate,
         var invoiceStatus: InvoiceStatus,
+        var totalAmount: Double,
         var itemsCount : Int,
 
         @OneToMany(fetch = FetchType.LAZY)

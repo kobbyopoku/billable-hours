@@ -30,7 +30,8 @@ class InvoiceController (val jobManagementService: JobManagementService, val inv
 
         var message: String
         var status: Int
-        var invoice: Invoice = Invoice(0, "",  LocalDate.now(), InvoiceStatus.PENDING, 0,mutableListOf());
+        var amount: Double? = 0.0
+        var invoice: Invoice = Invoice(0, "",  LocalDate.now(), InvoiceStatus.PENDING, 0.0, 0,mutableListOf());
         val companyJobs = jobManagementService.getAllCompanyJobs(company)
 
 
@@ -59,6 +60,10 @@ class InvoiceController (val jobManagementService: JobManagementService, val inv
                 invoiceData?.cost = invoiceData?.unitPrice?.times(invoiceData.numberOfHours!!)!!
                 invoiceData.employee = job.employee!!
 
+                    var cost = invoiceData?.cost
+
+                    amount = amount?.plus(cost!!)
+
                 val newInvoiceData: InvoiceData = invoiceManagementService.saveInvoiceData(invoiceData)
                 invoiceDataList.add(newInvoiceData)
                     jobManagementService.deleteJob(job)
@@ -66,6 +71,7 @@ class InvoiceController (val jobManagementService: JobManagementService, val inv
             }
 
 
+            invoice.totalAmount = amount!!
             invoice.itemsCount = invoiceDataList.size
             invoice.invoiceDataList = invoiceDataList
             invoiceManagementService.saveInvoice(invoice)
@@ -83,7 +89,7 @@ class InvoiceController (val jobManagementService: JobManagementService, val inv
     }
 
 
-    @ApiOperation(httpMethod = "GET", value = "This endpoint is used to generate invoices for a company")
+    @ApiOperation(httpMethod = "GET", value = "This endpoint is used to get invoices for a company")
     @GetMapping("/invoice/company/{company}")
     fun getCompanyInvoice( @PathVariable(name = "company") company: String):InvoicesResponse{
 
@@ -107,7 +113,7 @@ class InvoiceController (val jobManagementService: JobManagementService, val inv
     }
 
 
-    @ApiOperation(httpMethod = "GET", value = "This endpoint is used to generate invoices for a company")
+    @ApiOperation(httpMethod = "GET", value = "This endpoint is used list all invoices")
     @GetMapping("/invoices")
     fun getInvoicea():InvoicesResponse{
 
