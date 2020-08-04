@@ -11,6 +11,8 @@ import io.swagger.annotations.ApiOperation
 import lombok.extern.slf4j.Slf4j
 import org.springframework.web.bind.annotation.*
 import java.util.*
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 @Slf4j
 @CrossOrigin(origins = ["*"])
@@ -22,7 +24,7 @@ class JobController(val jobManagementService: JobManagementService, val employee
 
     @ApiOperation(httpMethod = "POST", value = "This endpoint is used to record new project by an employee")
     @PostMapping("/job/employee/{id}")
-    fun recordJob(@RequestBody jobs: Jobs, @PathVariable(name ="id")employeeId: Long): JobResponse{
+    fun recordJob(@RequestBody jobs: Jobs, @PathVariable(name ="id")employeeId: Long, httpServletRequest: HttpServletRequest, httpServletResponse: HttpServletResponse): JobResponse{
         val employee: Employee? = employeeManagementService.findEmployee(employeeId)
         val employeeJobs = EmployeeJobs(
                 id=jobs.id,
@@ -34,89 +36,51 @@ class JobController(val jobManagementService: JobManagementService, val employee
                 status = true,
                 invoiceStatus = false)
 
-        var  requestId = UUID.randomUUID().toString()
-        var message : String
-        var status : Int
+        httpServletRequest.requestedSessionId
 
+        val requestId = UUID.randomUUID().toString()
         val employeeJobsData = jobManagementService.addNewJob(employeeJobs)
-
-        if(employeeJobsData != null){
-            message = "success"
-            status = 200
-
-        }else{
-            message = "No data found"
-            status = 400
-        }
-
-
+        val message = if(employeeJobsData != null){"success"}else{"No data found"}
+        val status : Int = httpServletResponse.status
         return JobResponse(requestId, message, status, employee as Employee, mutableListOf(employeeJobsData))
-
     }
 
 
     @ApiOperation(httpMethod = "GET", value = "This endpoint is used to get jobs of an employee by id")
     @GetMapping("/job/employee/{id}")
-    fun getEmployeeJobs(@PathVariable(name = "id") employeeId: Long):JobResponse{
+    fun getEmployeeJobs(@PathVariable(name = "id") employeeId: Long, httpServletRequest: HttpServletRequest, httpServletResponse: HttpServletResponse):JobResponse{
 
-        var  requestId = UUID.randomUUID().toString()
-        var message : String
-        var status : Int
-
+        val requestId = UUID.randomUUID().toString()
         val employee = employeeManagementService.findEmployee(employeeId)
-
-        var employeeJobList  = jobManagementService.getEmployeeJobs(employee as Employee)
-
-        if(employeeJobList.isNotEmpty()){
-            message = "success"
-            status = 200
-
-        }else{
-            message = "No data found"
-            status = 400
-        }
-
-
+        val employeeJobList  = jobManagementService.getEmployeeJobs(employee as Employee)
+        val message = if(employeeJobList.isNotEmpty()){"success"}else{"No data found"}
+        val status : Int = httpServletResponse.status
         return JobResponse(requestId, message, status, employee, employeeJobList)
     }
 
     @ApiOperation(httpMethod = "GET", value = "This endpoint is used to get all jobs")
     @GetMapping("/jobs")
-    fun getAllJobs(): JobResponse {
-        var  requestId = UUID.randomUUID().toString()
-        var message : String
-        var status : Int
-
-
-        var employeeJobList =jobManagementService.getAllEmployeesJobs()
-
-        if(employeeJobList.isNotEmpty()){
-            message = "success"
-            status = 200
-
-        }else{
-            message = "No data found"
-            status = 400
-        }
-
+    fun getAllJobs( httpServletRequest: HttpServletRequest, httpServletResponse: HttpServletResponse): JobResponse {
+        val requestId = UUID.randomUUID().toString()
+        val employeeJobList =jobManagementService.getAllEmployeesJobs()
+        val message = if(employeeJobList.isNotEmpty()){"success"}else{"No data found"}
+        val status : Int = httpServletResponse.status
         return JobResponse(requestId, message, status, null, employeeJobList)
     }
 
     @ApiOperation(httpMethod = "GET", value = "This endpoint is used to get all jobs done for a specific company")
     @GetMapping("/jobs/company/{company}")
-    fun getAllCompanyJobs(@PathVariable(name = "company") company: String): MutableIterable<EmployeeJobs> {
+    fun getAllCompanyJobs(@PathVariable(name = "company") company: String, httpServletRequest: HttpServletRequest, httpServletResponse: HttpServletResponse): MutableIterable<EmployeeJobs> {
         return jobManagementService.getAllCompanyJobs(company)
     }
 
     @ApiOperation(httpMethod = "DELETE", value = "This endpoint is used to delete job by id")
     @DeleteMapping("/jobs/{id}")
-    fun getAllCompanyJobs(@PathVariable(name = "id") id: Long): JobResponse{
-        var  requestId = UUID.randomUUID().toString()
-        var message : String
-        var status : Int
-
+    fun getAllCompanyJobs(@PathVariable(name = "id") id: Long, httpServletRequest: HttpServletRequest, httpServletResponse: HttpServletResponse): JobResponse{
+        val requestId = UUID.randomUUID().toString()
+        val status = httpServletResponse.status
         jobManagementService.deleteJobById(id)
-        return JobResponse(requestId, "success", 200, null, mutableListOf())
+        return JobResponse(requestId, "success", status, null, mutableListOf())
     }
 
 }

@@ -10,7 +10,7 @@ import java.util.*
 @Repository
 interface EmployeeManagementRepository: CrudRepository<Employee, Long> {
     public override fun findById(id:Long): Optional<Employee>
-    public override fun findAll(): MutableList<Employee>
+    public override fun findAll(): MutableList<Employee?>
     fun findByEmail(email: String): Employee?
     fun findByEmailAndPassword(email: String, password: String): Employee?
 }

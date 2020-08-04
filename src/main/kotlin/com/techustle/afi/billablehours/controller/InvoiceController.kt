@@ -22,46 +22,43 @@ import javax.servlet.http.HttpServletResponse
 @RequestMapping("api/v1")
 class InvoiceController (val jobManagementService: JobManagementService, val invoiceManagementService: InvoiceManagementService){
 
-
     @ApiOperation(httpMethod = "GET", value = "This endpoint is used to generate invoices for a company")
     @GetMapping("/invoice/generate/{company}")
-    fun generateInvoice( @PathVariable(name = "company") company:String, httpServletRequest: HttpServletResponse, httpServletResponse: HttpServletRequest):InvoiceResponseObject? {
+    fun generateInvoice(
+            @PathVariable(name = "company") company:String,
+            httpServletResponse: HttpServletResponse,
+            httpServletRequest: HttpServletRequest):InvoiceResponseObject? {
         val requestId: String  = UUID.randomUUID().toString()
 
-        var message: String
-        var status: Int
+        val message: String
         var amount: Double? = 0.0
-        var invoice: Invoice = Invoice(0, "",  LocalDate.now(), InvoiceStatus.PENDING, 0.0, 0,mutableListOf());
+        var invoice: Invoice = Invoice(0, "",  LocalDate.now(), InvoiceStatus.PENDING, 0.0, 0,mutableListOf())
         val companyJobs = jobManagementService.getAllCompanyJobs(company)
 
 
-        invoice.company = company;
+        invoice.company = company
         if(companyJobs.isNotEmpty()) {
             invoice = invoiceManagementService.saveInvoice(invoice)
 
             val invoiceDataList = mutableListOf<InvoiceData>()
 
-            var invoiceData: InvoiceData? = InvoiceData(
+            val invoiceData: InvoiceData? = InvoiceData(
                     null,
                     null,
                     null,
                     null,
                     null
-            );
+            )
 
 
             companyJobs.forEach { job: EmployeeJobs ->
                 run {
-                    println(":: Now on job ${job.id}")
-
                 invoiceData?.id = job.id
-                invoiceData?.unitPrice = job.employee?.rate!!;
-                invoiceData?.numberOfHours = LocalTime.parse(job.endTime ).hour - LocalTime.parse(job.startTime).hour
+                invoiceData?.unitPrice = job.employee?.rate!!
+                    invoiceData?.numberOfHours = LocalTime.parse(job.endTime ).hour - LocalTime.parse(job.startTime).hour
                 invoiceData?.cost = invoiceData?.unitPrice?.times(invoiceData.numberOfHours!!)!!
                 invoiceData.employee = job.employee!!
-
-                    var cost = invoiceData?.cost
-
+                    val cost = invoiceData.cost
                     amount = amount?.plus(cost!!)
 
                 val newInvoiceData: InvoiceData = invoiceManagementService.saveInvoiceData(invoiceData)
@@ -70,69 +67,49 @@ class InvoiceController (val jobManagementService: JobManagementService, val inv
                 }
             }
 
-
+            invoice.invoiceStatus = InvoiceStatus.PENDING
             invoice.totalAmount = amount!!
             invoice.itemsCount = invoiceDataList.size
             invoice.invoiceDataList = invoiceDataList
             invoiceManagementService.saveInvoice(invoice)
-
             message="Success"
-            status = 200
-
         }else {
             message="No data found for $company"
             invoice.invoiceStatus = InvoiceStatus.NONE
-            status = 404
         }
-
+        val status = httpServletResponse.status
         return InvoiceResponseObject(requestId, message, status, invoice)
     }
 
 
     @ApiOperation(httpMethod = "GET", value = "This endpoint is used to get invoices for a company")
     @GetMapping("/invoice/company/{company}")
-    fun getCompanyInvoice( @PathVariable(name = "company") company: String):InvoicesResponse{
+    fun getCompanyInvoice(
+            @PathVariable(name = "company") company: String,
+            httpServletRequest: HttpServletRequest,
+            httpServletResponse: HttpServletResponse):InvoicesResponse{
 
         val requestId: String  = UUID.randomUUID().toString()
-        var message:String
-        var status:Int
-        var count : Int
-
         val companyInvoiceList: MutableList<Invoice> = invoiceManagementService.getCompanyInvoices(company)
-        count = companyInvoiceList.size
-        if(companyInvoiceList.isNotEmpty()){
-
-            message="Success"
-            status = 200
-        }else{
-
-            message="No data found for $company"
-            status = 404
-        }
+        val count = companyInvoiceList.size
+        val message = if(companyInvoiceList.isNotEmpty()){"Success"}else{"No data found for $company"}
+        val status = httpServletResponse.status
         return InvoicesResponse(requestId,message,status, count, companyInvoiceList)
     }
 
 
     @ApiOperation(httpMethod = "GET", value = "This endpoint is used list all invoices")
     @GetMapping("/invoices")
-    fun getInvoicea():InvoicesResponse{
+    fun getInvoice(
+            httpServletRequest: HttpServletRequest,
+            httpServletResponse: HttpServletResponse):InvoicesResponse{
 
         val requestId: String  = UUID.randomUUID().toString()
-        var message:String
-        var status:Int
-        var count : Int
 
         val companyInvoiceList: MutableList<Invoice> = invoiceManagementService.getAllInvoices()
-        count = companyInvoiceList.size
-        if(companyInvoiceList.isNotEmpty()){
-
-            message="Success"
-            status = 200
-        }else{
-
-            message="No data found"
-            status = 404
-        }
+        val count = companyInvoiceList.size
+        val message = if( companyInvoiceList.isNotEmpty() ){ "Success" }else{ "No data found"}
+        val status:Int = httpServletResponse.status
         return InvoicesResponse(requestId,message,status, count, companyInvoiceList)
     }
 
