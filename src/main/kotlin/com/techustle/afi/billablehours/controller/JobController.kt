@@ -109,9 +109,14 @@ class JobController(val jobManagementService: JobManagementService, val employee
     }
 
     @ApiOperation(httpMethod = "DELETE", value = "This endpoint is used to delete job by id")
-    @GetMapping("/jobs/company/{id}")
-    fun getAllCompanyJobs(@PathVariable(name = "id") id: Long) {
+    @DeleteMapping("/jobs/{id}")
+    fun getAllCompanyJobs(@PathVariable(name = "id") id: Long): JobResponse{
+        var  requestId = UUID.randomUUID().toString()
+        var message : String
+        var status : Int
+
         jobManagementService.deleteJobById(id)
+        return JobResponse(requestId, "success", 200, null, mutableListOf())
     }
 
 }
