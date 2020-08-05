@@ -15,6 +15,31 @@ The finance team has requested your help to be effective with revenue collection
 
 
 ## Setup
+
+### Database
+1. Pull MySQL docker image
+```shell
+docker pull mysql/mysql-server:latest
+```
+
+2. Create MySQL Docker container from image
+```shell
+docker run --name=[container_name] -d mysql/mysql-server:latest
+```
+
+3. Run mysql container
+```shell
+docker exec -it [container_name] mysql -uroot -p
+```
+
+4. Finally, create the database
+```shell
+CREATE DATABASE `billablehours`
+```
+
+
+### Backend REST API service
+
 1. Clone this repo unsing
 ```shell
 git clone https://github.com/kobbyopoku/billable-hours.git
