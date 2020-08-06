@@ -23,6 +23,10 @@ class EmployeeManagementService(val employeeManagementRepository: EmployeeManage
     fun login(email: String, password: String): Employee? {
         return employeeManagementRepository.findByEmailAndPassword(email, password)
     }
+
+    fun findEmployeeByEmail(email: String): Employee? {
+        return employeeManagementRepository.findByEmail(email)
+    }
 }
 
 

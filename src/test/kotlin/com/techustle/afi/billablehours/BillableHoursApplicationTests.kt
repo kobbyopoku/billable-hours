@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -23,10 +25,18 @@ class BillableHoursApplicationTests() {
         Assertions.assertEquals(1,LocalTime.parse("21:00" ).hour - LocalTime.parse("20:00").hour)
     }
 
+
+
 }
 
 @SpringBootTest
 class JpaTest(@Autowired val employeeManagementService: EmployeeManagementService, @Autowired val jobManagementService: JobManagementService){
+
+    fun encoder(): PasswordEncoder {
+        return BCryptPasswordEncoder()
+    }
+
+
     @Test
     fun testSaveEmployee() {
         val employee: Employee =  Employee(1, "Godwin","Duah","gentlekobby@gmail.com","1234509876", "LAWYER","4A",500.0)
@@ -40,5 +50,13 @@ class JpaTest(@Autowired val employeeManagementService: EmployeeManagementServic
         val employeeJobs: EmployeeJobs = EmployeeJobs(1, employee, "MTN", LocalDate.now(), "20:00:00", "21:00:00", true, true)
         Assertions.assertNotNull( jobManagementService.addNewJob(employeeJobs))
         Assertions.assertNotNull(jobManagementService.getAllCompanyJobs("MTN"))
+    }
+
+    @Test
+    fun passwordTest() {
+        val onAppStart: OnAppStart = OnAppStart(employeeManagementService)
+        onAppStart.createDefaultAdminUser()
+        val employee = employeeManagementService.findEmployeeByEmail("admin@billablehours.com")
+        Assertions.assertTrue(encoder().matches("admin123", employee?.password))
     }
 }

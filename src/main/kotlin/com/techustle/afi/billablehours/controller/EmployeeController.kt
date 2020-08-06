@@ -8,6 +8,8 @@ import com.techustle.afi.billablehours.service.EmployeeManagementService
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import lombok.extern.slf4j.Slf4j
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.util.*
 import javax.servlet.http.HttpServletRequest
@@ -20,6 +22,9 @@ import javax.servlet.http.HttpServletResponse
 @RequestMapping("/api/v1")
 class EmployeeController (val employeeManagementService: EmployeeManagementService) {
 
+    fun encoder(): PasswordEncoder {
+        return BCryptPasswordEncoder()
+    }
 
     @ApiOperation(httpMethod = "POST", value = "This endpoint is used to create a new employee")
     @PostMapping("/employee")
@@ -28,10 +33,14 @@ class EmployeeController (val employeeManagementService: EmployeeManagementServi
             httpServletRequest: HttpServletRequest,
             httpServletResponse: HttpServletResponse): EmployeeResponse{
         val requestId: String = UUID.randomUUID().toString()
-        val employee = employeeManagementService.createEmployee(employeeData)
+
+        val securePassword = encoder().encode(employeeData.password)
+        employeeData.password = securePassword
+        val existingEmployee = employeeManagementService.findEmployeeByEmail(employeeData.email)
+        existingEmployee ?: employeeManagementService.createEmployee(employeeData)
         val message = "Success"
         val status = httpServletResponse.status
-        return EmployeeResponse(requestId, message, status, mutableListOf(employee))
+        return EmployeeResponse(requestId, message, status, mutableListOf(existingEmployee))
     }
 
 
@@ -88,10 +97,12 @@ class EmployeeController (val employeeManagementService: EmployeeManagementServi
             @RequestBody authRequest: AuthRequest,
             httpServletRequest: HttpServletRequest,
             httpServletResponse: HttpServletResponse): AuthResponse {
-        val employee: Employee? =  employeeManagementService.login(authRequest.email, authRequest.password)
+        val employee: Employee? =  employeeManagementService.findEmployeeByEmail(authRequest.email)
         val requestId: String  = UUID.randomUUID().toString()
-        val message = if(employee != null && authRequest.password == employee.password){ "Success" }else{ "Invalid email or password" }
+
+        val message =  if(encoder().matches(employee?.password, authRequest.password)){"success" }else{"Invalid username or password"}
         val status = httpServletResponse.status
+        encoder().matches(authRequest.password, employee?.password)
         return AuthResponse(requestId, message, status, employee)
     }
 }
