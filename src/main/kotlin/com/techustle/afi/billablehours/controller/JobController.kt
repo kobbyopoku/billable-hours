@@ -63,25 +63,29 @@ class JobController(val jobManagementService: JobManagementService, val employee
         val message: String?
         val employee = employeeManagementService.findEmployee(employeeId)
 
+        val jobList: MutableList<EmployeeJobs?>
         var employeeJob: EmployeeJobs? = null
         if(employee != null) {
-            employeeJob = jobManagementService.getJobByIdAndEmployee(jobId, employee )
-            val newBreak: Break = Break(0,breaks.start,breaks.end)
+            employeeJob = jobManagementService.getJobById(jobId)
+            if (employeeJob != null && employeeJob.employee?.equals(employee) == true) {
 
-//            newBreak.start = breaks.start
-//            newBreak.end = breaks.end
-//            newBreak.job = employeeJob
+                val newBreak: Break = Break(0, breaks.start, breaks.end)
+                breakService.recordBreak(newBreak)
+                employeeJob.breaks = mutableListOf(newBreak)
+                jobManagementService.addNewJob(employeeJob)
 
-            breakService.recordBreak(newBreak)
-            employeeJob.breaks = mutableListOf(newBreak)
-            jobManagementService.addNewJob(employeeJob)
-            message =  "Employee break recorded"
-
+                message =  "Employee break recorded"
+                jobList = mutableListOf(employeeJob)
+            }else{
+                message =  "Employee job not found"
+                jobList = mutableListOf()
+            }
         }else{
             message = "Employee not found"
+            jobList = mutableListOf()
         }
 
-        return JobResponse(requestId, message, httpServletResponse.status, employee, mutableListOf(employeeJob))
+        return JobResponse(requestId, message, httpServletResponse.status, employee, jobList)
     }
 
 
