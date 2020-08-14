@@ -16,12 +16,3 @@ interface EmployeeManagementRepository: CrudRepository<Employee, Long> {
 }
 
 
-@Repository
-interface JobManagementRepository: CrudRepository<EmployeeJobs, Long>{
-    fun findAllById(employeeId: Long):MutableIterator<EmployeeJobs>
-    fun findAllByEmployee(employeeId: Employee): MutableList<EmployeeJobs>
-    fun findAllByProject(company: String): MutableList<EmployeeJobs>
-    override fun findAll(): MutableList<EmployeeJobs>
-
-}
-

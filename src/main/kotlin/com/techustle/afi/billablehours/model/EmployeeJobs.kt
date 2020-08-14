@@ -18,6 +18,8 @@ class EmployeeJobs(
         @CreatedDate
         var date: LocalDate,
 
+        @OneToMany(fetch = FetchType.LAZY)
+        var breaks: MutableList<Break>,
 
         var startTime: String,
 
@@ -26,8 +28,4 @@ class EmployeeJobs(
         var status : Boolean,
 
         var invoiceStatus: Boolean
-) {
-
-
-
-}
+) {}

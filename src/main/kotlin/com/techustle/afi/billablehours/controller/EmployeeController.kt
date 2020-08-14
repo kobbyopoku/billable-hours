@@ -34,11 +34,15 @@ class EmployeeController (val employeeManagementService: EmployeeManagementServi
             httpServletResponse: HttpServletResponse): EmployeeResponse{
         val requestId: String = UUID.randomUUID().toString()
 
+        var message = "Success"
         val securePassword = encoder().encode(employeeData.password)
         employeeData.password = securePassword
         val existingEmployee = employeeManagementService.findEmployeeByEmail(employeeData.email)
+        message = existingEmployee.let {
+            "Employee with email ${employeeData.email} exists"
+        }?: "Employee created successfully"
         existingEmployee ?: employeeManagementService.createEmployee(employeeData)
-        val message = "Success"
+
         val status = httpServletResponse.status
         return EmployeeResponse(requestId, message, status, mutableListOf(existingEmployee))
     }
@@ -102,7 +106,6 @@ class EmployeeController (val employeeManagementService: EmployeeManagementServi
 
         val message =  if(encoder().matches(employee?.password, authRequest.password)){"success" }else{"Invalid username or password"}
         val status = httpServletResponse.status
-        encoder().matches(authRequest.password, employee?.password)
         return AuthResponse(requestId, message, status, employee)
     }
 }

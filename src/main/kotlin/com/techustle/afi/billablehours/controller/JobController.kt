@@ -1,9 +1,12 @@
 package com.techustle.afi.billablehours.controller
 
+import com.techustle.afi.billablehours.data.BreakHelper
+import com.techustle.afi.billablehours.model.Break
 import com.techustle.afi.billablehours.data.JobResponse
 import com.techustle.afi.billablehours.data.Jobs
 import com.techustle.afi.billablehours.model.Employee
 import com.techustle.afi.billablehours.model.EmployeeJobs
+import com.techustle.afi.billablehours.service.BreakService
 import com.techustle.afi.billablehours.service.EmployeeManagementService
 import com.techustle.afi.billablehours.service.JobManagementService
 import io.swagger.annotations.Api
@@ -19,7 +22,7 @@ import javax.servlet.http.HttpServletResponse
 @Api("This controller handles management and operations of projects")
 @RestController
 @RequestMapping("/api/v1")
-class JobController(val jobManagementService: JobManagementService, val employeeManagementService: EmployeeManagementService) {
+class JobController(val jobManagementService: JobManagementService, val employeeManagementService: EmployeeManagementService, val breakService: BreakService) {
 
 
     @ApiOperation(httpMethod = "POST", value = "This endpoint is used to record new project by an employee")
@@ -29,6 +32,7 @@ class JobController(val jobManagementService: JobManagementService, val employee
         val employeeJobs = EmployeeJobs(
                 id=jobs.id,
                 project = jobs.project,
+                breaks = mutableListOf(),
                 startTime = jobs.startTime,
                 endTime = jobs.endTime,
                 employee = employee,
@@ -40,9 +44,44 @@ class JobController(val jobManagementService: JobManagementService, val employee
 
         val requestId = UUID.randomUUID().toString()
         val employeeJobsData = jobManagementService.addNewJob(employeeJobs)
-        val message = if(employeeJobsData != null){"success"}else{"No data found"}
+        val message = "success"
         val status : Int = httpServletResponse.status
         return JobResponse(requestId, message, status, employee as Employee, mutableListOf(employeeJobsData))
+    }
+
+
+    @PostMapping("/job/{jobId}/employee/{empId}")
+    fun recordBreak(
+            @PathVariable(name ="jobId") jobId: Long,
+            @PathVariable(name = "empId") employeeId: Long,
+            @RequestBody breaks: BreakHelper,
+            httpServletResponse: HttpServletResponse,
+            httpServletRequest: HttpServletRequest
+    ): JobResponse{
+
+        val requestId = UUID.randomUUID().toString()
+        val message: String?
+        val employee = employeeManagementService.findEmployee(employeeId)
+
+        var employeeJob: EmployeeJobs? = null
+        if(employee != null) {
+            employeeJob = jobManagementService.getJobByIdAndEmployee(jobId, employee )
+            val newBreak: Break = Break(0,breaks.start,breaks.end)
+
+//            newBreak.start = breaks.start
+//            newBreak.end = breaks.end
+//            newBreak.job = employeeJob
+
+            breakService.recordBreak(newBreak)
+            employeeJob.breaks = mutableListOf(newBreak)
+            jobManagementService.addNewJob(employeeJob)
+            message =  "Employee break recorded"
+
+        }else{
+            message = "Employee not found"
+        }
+
+        return JobResponse(requestId, message, httpServletResponse.status, employee, mutableListOf(employeeJob))
     }
 
 
@@ -52,7 +91,7 @@ class JobController(val jobManagementService: JobManagementService, val employee
 
         val requestId = UUID.randomUUID().toString()
         val employee = employeeManagementService.findEmployee(employeeId)
-        val employeeJobList  = jobManagementService.getEmployeeJobs(employee as Employee)
+        val employeeJobList:MutableList<EmployeeJobs?>  = jobManagementService.getEmployeeJobs(employee as Employee)
         val message = if(employeeJobList.isNotEmpty()){"success"}else{"No data found"}
         val status : Int = httpServletResponse.status
         return JobResponse(requestId, message, status, employee, employeeJobList)
@@ -62,7 +101,7 @@ class JobController(val jobManagementService: JobManagementService, val employee
     @GetMapping("/jobs")
     fun getAllJobs( httpServletRequest: HttpServletRequest, httpServletResponse: HttpServletResponse): JobResponse {
         val requestId = UUID.randomUUID().toString()
-        val employeeJobList =jobManagementService.getAllEmployeesJobs()
+        val employeeJobList:MutableList<EmployeeJobs?> =jobManagementService.getAllEmployeesJobs()
         val message = if(employeeJobList.isNotEmpty()){"success"}else{"No data found"}
         val status : Int = httpServletResponse.status
         return JobResponse(requestId, message, status, null, employeeJobList)
