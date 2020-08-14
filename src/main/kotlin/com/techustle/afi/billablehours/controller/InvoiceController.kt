@@ -3,6 +3,7 @@ package com.techustle.afi.billablehours.controller
 import com.techustle.afi.billablehours.model.InvoiceData
 import com.techustle.afi.billablehours.data.InvoiceResponseObject
 import com.techustle.afi.billablehours.data.InvoicesResponse
+import com.techustle.afi.billablehours.model.Break
 import com.techustle.afi.billablehours.model.EmployeeJobs
 import com.techustle.afi.billablehours.model.Invoice
 import com.techustle.afi.billablehours.service.InvoiceManagementService
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.*
+import java.util.stream.IntStream
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -47,22 +49,26 @@ class InvoiceController (val jobManagementService: JobManagementService, val inv
                     null,
                     null,
                     null,
+                    null,
                     null
             )
 
 
             companyJobs.forEach { job: EmployeeJobs ->
                 run {
-                invoiceData?.id = job.id
-                invoiceData?.unitPrice = job.employee?.rate!!
+
+                    job.breaks.forEach{ b: Break -> run{ invoiceData?.breakHours =+ LocalTime.parse(b.end).hour - LocalTime.parse(b.start).hour}}
+                    invoiceData?.id = job.id
+                    invoiceData?.unitPrice = job.employee?.rate!!
                     invoiceData?.numberOfHours = LocalTime.parse(job.endTime ).hour - LocalTime.parse(job.startTime).hour
-                invoiceData?.cost = invoiceData?.unitPrice?.times(invoiceData.numberOfHours!!)!!
-                invoiceData.employee = job.employee!!
+
+                    invoiceData?.cost = invoiceData?.unitPrice?.times(invoiceData.numberOfHours!!)!!
+                    invoiceData.employee = job.employee!!
                     val cost = invoiceData.cost
                     amount = amount?.plus(cost!!)
 
-                val newInvoiceData: InvoiceData = invoiceManagementService.saveInvoiceData(invoiceData)
-                invoiceDataList.add(newInvoiceData)
+                    val newInvoiceData: InvoiceData = invoiceManagementService.saveInvoiceData(invoiceData)
+                    invoiceDataList.add(newInvoiceData)
                     jobManagementService.deleteJob(job)
                 }
             }

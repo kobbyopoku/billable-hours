@@ -13,6 +13,7 @@ data class InvoiceData(
         @OneToOne
         var employee: Employee?,
         var numberOfHours: Int?,
+        var breakHours: Int?,
         var unitPrice: Double?,
         var cost: Double?) {
 }
