@@ -57,10 +57,14 @@ class InvoiceController (val jobManagementService: JobManagementService, val inv
             companyJobs.forEach { job: EmployeeJobs ->
                 run {
 
-                    job.breaks.forEach{ b: Break -> run{ invoiceData?.breakHours =+ LocalTime.parse(b.end).hour - LocalTime.parse(b.start).hour}}
+                    var breakHours = 0
+                    var workingHours = 0
+
+                    job.breaks.forEach{ b: Break -> run{ breakHours =+ LocalTime.parse(b.end).hour - LocalTime.parse(b.start).hour}}
                     invoiceData?.id = job.id
                     invoiceData?.unitPrice = job.employee?.rate!!
-                    invoiceData?.numberOfHours = LocalTime.parse(job.endTime ).hour - LocalTime.parse(job.startTime).hour
+                    workingHours  = LocalTime.parse(job.endTime ).hour - LocalTime.parse(job.startTime).hour
+                    invoiceData?.numberOfHours = workingHours - breakHours
 
                     invoiceData?.cost = invoiceData?.unitPrice?.times(invoiceData.numberOfHours!!)!!
                     invoiceData.employee = job.employee!!
